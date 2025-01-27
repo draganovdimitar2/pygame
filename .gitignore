@@ -1,0 +1,16 @@
+# Python
+**__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+
+# IDEs
+.idea/
+*.swp
+
+# MacOS
+.DS_Store
+
+env/
+.vercel
