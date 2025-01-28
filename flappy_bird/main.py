@@ -2,42 +2,113 @@ import pygame
 from sys import exit
 from random import randint
 
+
+class Bird(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()  # to inherit from the base class
+        self.bird_jump = pygame.image.load('graphics/bird_jumping.png').convert_alpha()
+        self.bird_falling = pygame.image.load('graphics/bird_falling.png').convert_alpha()
+        self.bird_horizontal = pygame.image.load('graphics/bird.png').convert_alpha()
+
+        self.image = self.bird_horizontal  # default bird position is horizontal
+        self.rect = self.image.get_rect(topleft=(50, 200))
+        self.velocity_y = 0  # velocity variable for smooth movement
+        self.gravity = 0.5
+        self.flap_strength = -6  # adjusted jump strength
+
+    def player_input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and game_active:
+            self.velocity_y = self.flap_strength  # set the velocity on jump
+
+    def apply_gravity(self):
+        self.velocity_y += self.gravity  # apply gravity to velocity
+        self.rect.y += self.velocity_y  # update bird's position based on velocity
+
+    def animation_state(self):
+        # Update animation based on vertical position
+        if self.velocity_y < 0:  # bird is going up
+            self.image = self.bird_jump
+        elif self.velocity_y >= 0:  # bird is falling or horizontal
+            self.image = self.bird_falling
+
+        # Ensure the image rect is updated based on the bird's position
+        self.rect = self.image.get_rect(center=self.rect.center)
+
+    def update(self):
+        self.player_input()
+        self.apply_gravity()
+        self.animation_state()
+
+
+down_pipe_y = randint(400, 630)  # random number for lower pipe y
+gap = 150  # the gap between pipes
+upper_pipe_y = down_pipe_y - gap
+
+
+class Pipes(pygame.sprite.Sprite):
+    def __init__(self, is_upper=False, down_pipe_y=None):
+        super().__init__()
+        self.image = pygame.image.load('graphics/pipe.png').convert_alpha()
+        self.passed = False  # to track if the pipe has been passed by the bird
+        if is_upper:
+            self.image = pygame.transform.flip(self.image, False, True)
+            self.rect = self.image.get_rect(midbottom=(480, down_pipe_y - gap))  # Place upper pipe
+        else:
+            self.rect = self.image.get_rect(midtop=(480, down_pipe_y))  # Place lower pipe
+
+    def update(self):
+        # Move the pipe to the left
+        self.rect.x -= 5
+        # If the pipe moves off the screen, kill it (remove from group)
+        if self.rect.right < 0:
+            self.kill()
+
+
+def spawn_pipes():
+    down_pipe_y = randint(400, 630)
+    lower_pipe = Pipes(is_upper=False, down_pipe_y=down_pipe_y)
+    upper_pipe = Pipes(is_upper=True, down_pipe_y=down_pipe_y)
+    pipes.add(lower_pipe, upper_pipe)
+
+
+def reset_game():
+    """Reset the game state for a new round."""
+    global points, game_active, gap
+    pipes.empty()  # Clear the pipes
+    spawn_pipes()  # Spawn new pipes
+    bird_group.empty()  # Clear the bird group
+    bird_sprite = Bird()  # Create a new bird instance
+    bird_group.add(bird_sprite)  # Add the bird to the group
+
+    gap = 150
+    points = 0.0  # Reset points to 0.0
+    game_active = True  # Set the game state to active
+
+
 pygame.init()  # always used to initialize the game
 screen = pygame.display.set_mode((480, 800))  # set the display dimensions
 clock = pygame.time.Clock()
-fps = 60
+FPS = 60
 
 pygame.display.set_caption("Flappy Bird")  # name of the display
 points_font = pygame.font.SysFont(name='arial', size=75, bold=True)  # used for points counter
 
 game_active = True
-player_gravity = 0
-gap = 160  # each 5 points increase, the gap will decrease with 5 px
-points = 0
-pipe_passed = False  # flag to check whether bird has passed the pipe
+points = 0.0  # points counter
 
 background_surface = pygame.image.load('graphics/background.png').convert()
 game_over_surface = pygame.image.load('graphics/game_over.png').convert_alpha()
 play_again_button = pygame.image.load("graphics/play_again_button.jpg").convert_alpha()
-down_pipe_sur = pygame.image.load('graphics/pipe.png').convert_alpha()
-pipe_width = down_pipe_sur.get_width()
-pipe_height = down_pipe_sur.get_height()
+play_again_button_rect = play_again_button.get_rect(center=(240, 540))
 
-upper_pipe_sur = pygame.transform.flip(down_pipe_sur, False, True)
-bird_surface = pygame.image.load('graphics/bird.png').convert_alpha()
-bird_rect = bird_surface.get_rect(topleft=(50, 200))
+bird_group = pygame.sprite.GroupSingle()  # single sprite group for the bird
+bird_sprite = Bird()
+bird_group.add(bird_sprite)
 
+pipes = pygame.sprite.Group()  # group for the pipes
+spawn_pipes()
 
-def generate_pipes():
-    down_pipe_y = randint(400, 630)
-    down_pipe_rect = down_pipe_sur.get_rect(midtop=(480, down_pipe_y))
-    upper_pipe_y = down_pipe_y - gap
-    upper_pipe_rect = upper_pipe_sur.get_rect(midbottom=(480, upper_pipe_y))
-    return down_pipe_rect, upper_pipe_rect
-
-
-down_pipe_rect, upper_pipe_rect = generate_pipes()
-print(f'down: {down_pipe_rect.y}')
 while True:  # our game runs withing this loop
     for event in pygame.event.get():  # to get ell the events and loop through them
         if event.type == pygame.QUIT:  # to close the window
@@ -45,45 +116,43 @@ while True:  # our game runs withing this loop
             exit()  # to break the while loop
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and game_active:
-                player_gravity = -11
+                bird_sprite.velocity_y = bird_sprite.flap_strength
 
     if game_active:
         screen.blit(background_surface, (0, 0))
+        pipes.update()
+        pipes.draw(screen)
 
-        down_pipe_rect.x -= 5  # to move the pipes left
-        upper_pipe_rect.x -= 5  # to move the pipes left
-        screen.blit(down_pipe_sur, down_pipe_rect)  # add pipes to the screen
-        screen.blit(upper_pipe_sur, upper_pipe_rect)
+        # Spawn new pipes when the last pipe is off the screen
+        if len(pipes) == 0 or pipes.sprites()[-1].rect.right < 0:  # Check if the last pipe is off the screen
+            spawn_pipes()
 
-        if down_pipe_rect.right < 0:
-            down_pipe_rect, upper_pipe_rect = generate_pipes()
-            pipe_passed = False  # reset the flag
+        bird_group.update()  # call the update method of out Bird class
+        bird_group.draw(screen)  # add bird to the screen
 
-        player_gravity += 1  # add gravity to update bird position
-        bird_rect.y += player_gravity
-        screen.blit(bird_surface, bird_rect)  # add bird to the screen
+        # Check if the bird has passed the last pipe
+        for pipe in pipes:
+            if pipe.rect.right < bird_group.sprite.rect.left and not pipe.passed:  # Check if bird passed the pipe
+                points += 0.5  # for each passed pipe increase score by 0.5 so when pass upper and lower pipe score += 1
+                pipe.passed = True  # Set flag to avoid multiple increments
+                if gap > 120:  # min gap is 120
+                    gap -= 0.5
 
-        # Check if bird passed the pipe
-        if not pipe_passed and bird_rect.x > down_pipe_rect.x + pipe_width:
-            points += 1  # Increment points
-            if points % 5 == 0 and gap > 125:
-                gap -= 5
-            pipe_passed = True  # Set flag to avoid multiple increments
+        points_display = int(points)  # display the points as integer
 
         # Update points surface dynamically
-        points_surface = points_font.render(str(points), False, 'Black')
+        points_surface = points_font.render(str(points_display), False, 'Black')
         points_rect = points_surface.get_rect(center=(240, 50))  # Center for the score
         screen.blit(points_surface, points_rect)  # Draw points
 
-        if down_pipe_rect.x == 0:
-            down_pipe_rect.x = 480
-            upper_pipe_rect.x = 480
+        collision = pygame.sprite.spritecollide(
+            bird_group.sprite,  # The single sprite from bird_group
+            pipes,  # The group containing all pipe sprites
+            False  # Keep the pipes in the group after collision (don't remove them)
+        )
 
-            # Check for collisions
-        if (bird_rect.colliderect(down_pipe_rect) or
-                bird_rect.colliderect(upper_pipe_rect) or
-                bird_rect.top < 0 or bird_rect.bottom >= screen.get_height()):  # Prevent bird from going off-screen
-            game_active = False
+        if collision or bird_group.sprite.rect.top <= 0 or bird_group.sprite.rect.bottom >= screen.get_height():
+            game_active = False  # End the game if collision occurs or bird is out of bounds
     else:
         game_over_rect = game_over_surface.get_rect(center=(240, 400))
         play_again_button_rect = play_again_button.get_rect(center=(240, 540))
@@ -91,14 +160,8 @@ while True:  # our game runs withing this loop
         screen.blit(game_over_surface, game_over_rect)
         mouse_pos = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN and not game_active:
-            if play_again_button_rect.collidepoint(pygame.mouse.get_pos()):
-                # Reset game state
-                bird_rect.topleft = (50, 200)
-                player_gravity = 0
-                down_pipe_rect, upper_pipe_rect = generate_pipes()
-                points = 0
-                pipe_passed = False
-                game_active = True
+            if play_again_button_rect.collidepoint(mouse_pos):
+                reset_game()  # Call the reset function
 
     pygame.display.update()  # to update everything on our display surface
-    clock.tick(fps)  # to tell the while loop to not run faster than 60 fps
+    clock.tick(FPS)  # to tell the while loop to not run faster than 60 fps
