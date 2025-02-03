@@ -1,13 +1,18 @@
-import pygame
-from random import randint
-
-apple_rect_x = randint(0, 600)
-apple_rect_y = randint(0, 600)
+import pygame, random
+from pygame.math import Vector2
+from settings import CELL_NUMBER, CELL_SIZE
 
 
-class Apple(pygame.sprite.Sprite):
+class Apple:
 
     def __init__(self):
-        super().__init__()
-        self.image = pygame.image.load('images/apple.png')
-        self.rect = self.image.get_rect(midbottom = (apple_rect_x, apple_rect_y))
+        self.randomize()
+
+    def draw_apple(self, screen):
+        apple_rect = pygame.Rect(int(self.pos.x * CELL_SIZE), int(self.pos.y * CELL_SIZE), CELL_SIZE, CELL_SIZE)
+        pygame.draw.rect(screen, (126, 166, 144), apple_rect)
+
+    def randomize(self):
+        self.x = random.randint(0, CELL_NUMBER - 1)
+        self.y = random.randint(0, CELL_NUMBER - 1)
+        self.pos = Vector2(self.x, self.y)
