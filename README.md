@@ -4,8 +4,8 @@ This repository contains basic implementations of classic games using the Pygame
 
 ## Games Included
 
-### 1. Snake Game (under development)
-A simple Snake game where the player controls a growing snake, aiming to collect food while avoiding collisions with itself and the screen boundaries. Please note that this game is still in development, and features may change.
+### 1. Snake Game 
+A simple Snake game where the player controls a growing snake, aiming to collect food while avoiding collisions with itself and the screen boundaries.
 
 ### 2. Flappy Bird Clone
 A basic Flappy Bird clone where the player controls a bird that must navigate through gaps between pipes by flapping its wings.
