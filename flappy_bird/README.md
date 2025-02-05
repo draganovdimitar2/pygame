@@ -32,7 +32,7 @@ A simple implementation of the Flappy Bird game using Python and Pygame. The obj
     ```
 4. Navigate to the project directory:
     ```bash
-    cd pygame
+    cd pygame/flappy_bird
     ```
 5. Run the game:
    ```bash
