@@ -29,7 +29,7 @@ Welcome to the Snake Game built using Python and Pygame! 🎮
     ```
 4. Navigate to the project directory:
     ```bash
-    cd pygame
+    cd pygame/snake
     ```
 5. Run the game:
    ```bash
