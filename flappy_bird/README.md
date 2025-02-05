@@ -1,5 +1,8 @@
 # Flappy Bird Clone
 
+### Demo Video
+https://github.com/user-attachments/assets/79074d4f-3677-4984-8b35-eacdaa620c63
+
 A simple implementation of the Flappy Bird game using Python and Pygame. The objective is to navigate the bird through pipes without colliding, while scoring points by passing through the gaps.
 
 ## Features
