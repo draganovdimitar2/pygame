@@ -18,4 +18,4 @@ class Knight(Piece):
         return possible_moves
 
     def __repr__(self):
-        return f'{self.color}_knight'
+        return f'knight_{self.color}'

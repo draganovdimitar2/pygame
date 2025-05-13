@@ -1,14 +1,17 @@
-from chess.pieces.pawn import Pawn
-from chess.pieces.knight import Knight
+from chess.pieces.queen import Queen
 from chess.pieces.rook import Rook
 from chess.pieces.bishop import Bishop
-from chess.pieces.queen import Queen
+from chess.pieces.knight import Knight
+from chess.pieces.pawn import Pawn
 from chess.pieces.king import King
 
 
 class Board:
-    @staticmethod
-    def draw_board():
+    def __init__(self):
+        self.board = self.draw_board()
+        self.draw_pieces_on_board()
+
+    def draw_board(self):
         board = []
         for i in range(8):
             if i == 0:
@@ -23,34 +26,30 @@ class Board:
             elif i == 7:
                 board.append(['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'])  # first row for black pieces
                 continue
-            board.append([])
-
-            for j in range(8):
-                board[i].append('.')
+            board.append(['.'] * 8)  # Empty rows for other squares
 
         return board
 
-    @staticmethod
-    def create_piece(piece_code, row, col, color):
-        if piece_code == 'R':
-            return Rook(row, col, color)
-        elif piece_code == 'N':
-            return Knight(row, col, color)
-        elif piece_code == 'P':
-            return Pawn(row, col, color)
-        elif piece_code == 'B':
-            return Bishop(row, col, color)
-        elif piece_code == 'Q':
-            return Queen(row, col, color)
-        elif piece_code == 'K':
-            return King(row, col, color)
+    def create_piece(self, piece_code, row, col, color):
+        piece_map = {
+            'R': Rook,
+            'N': Knight,
+            'P': Pawn,
+            'B': Bishop,
+            'Q': Queen,
+            'K': King
+        }
 
-    @staticmethod
-    def draw_pieces_on_board(board):
+        if piece_code == '.':
+            return None
+
+        piece_class = piece_map.get(piece_code)
+        return piece_class(row, col, color)
+
+    def draw_pieces_on_board(self):
         for row in range(8):
             for col in range(8):
-                if row == 0 or row == 1:
-                    board[row][col] = Board.create_piece(board[row][col], row, col, 'w')
-                elif row == 6 or row == 7:
-                    board[row][col] = Board.create_piece(board[row][col], row, col, 'b')
-        return board
+                piece_code = self.board[row][col]
+                if piece_code != '.':
+                    color = 'b' if row < 2 else 'w'
+                    self.board[row][col] = self.create_piece(piece_code, row, col, color)

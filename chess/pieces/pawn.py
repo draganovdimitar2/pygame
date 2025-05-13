@@ -5,6 +5,7 @@ class Pawn(Piece):
     def __init__(self, row, col, color):
         super().__init__(row, col, color)
         self.forward = -1 if color == 'w' else 1
+        self.reached_promotion_rank = False  # flag for promotion
 
     def current_possible_moves(self, board):
         moves = []
@@ -29,4 +30,4 @@ class Pawn(Piece):
         return moves
 
     def __repr__(self):
-        return f'{self.color}_pawn'
+        return f'pawn_{self.color}'

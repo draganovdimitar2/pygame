@@ -4,10 +4,9 @@ from chess.pieces.piece import Piece
 class Queen(Piece):
     def __init__(self, row, col, color):
         super().__init__(row, col, color)
-        # Combine rook + bishop directions
         self.directions = [
-            (-1, 0), (1, 0), (0, -1), (0, 1),  # rook
-            (-1, -1), (-1, 1), (1, -1), (1, 1)  # bishop
+            (-1, 0), (1, 0), (0, -1), (0, 1),
+            (-1, -1), (-1, 1), (1, -1), (1, 1)
         ]
 
     def current_possible_moves(self, board):
@@ -27,4 +26,4 @@ class Queen(Piece):
         return possible_moves
 
     def __repr__(self):
-        return f'{self.color}_queen'
+        return f'queen_{self.color}'

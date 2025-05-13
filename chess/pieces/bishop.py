@@ -23,4 +23,4 @@ class Bishop(Piece):
         return possible_moves
 
     def __repr__(self):
-        return f'{self.color}_bishop'
+        return f'bishop_{self.color}'

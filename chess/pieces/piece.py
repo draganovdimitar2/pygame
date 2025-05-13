@@ -1,4 +1,8 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+import pygame
+from chess.visualisation import images
+from chess.settings import SQUARE_SIZE
+
 
 class Piece(ABC):  # abstract class for all pieces
     POSSIBLE_COLORS = ['b', 'w']
@@ -9,16 +13,8 @@ class Piece(ABC):  # abstract class for all pieces
         self.color = color
         self.selected = False
         self.moves = {}  # dict to store the moves for each piece
+        self.image = pygame.transform.scale(images[self.__repr__()], (SQUARE_SIZE, SQUARE_SIZE))
 
-    @property
-    def color(self):
-        return self.__color
-
-    @color.setter
-    def color(self, value):
-        if value not in self.POSSIBLE_COLORS:
-            return 'Possible colors are b and w'
-        self.__color = value
-
+    @abstractmethod
     def current_possible_moves(self, board):
         pass

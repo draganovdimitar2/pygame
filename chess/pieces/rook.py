@@ -5,6 +5,7 @@ class Rook(Piece):
     def __init__(self, row, col, color):
         super().__init__(row, col, color)
         self.directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        self.has_moved = False
 
     def current_possible_moves(self, board):
         possible_moves = []
@@ -23,4 +24,4 @@ class Rook(Piece):
         return possible_moves
 
     def __repr__(self):
-        return f'{self.color}_rook'
+        return f'rook_{self.color}'
