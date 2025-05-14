@@ -43,6 +43,9 @@ def draw_pieces(board, screen, sq_size):
 
 
 def draw_sidebar(win, game_state, captured_white, captured_black):
+    """
+    Draw the right-hand sidebar showing game info and captured pieces.
+    """
     font = pygame.font.SysFont('Arial', 24)
     small_font = pygame.font.SysFont('Arial', 20)
 
@@ -67,6 +70,9 @@ def draw_sidebar(win, game_state, captured_white, captured_black):
 
 
 def draw_game_over(win, game_state):
+    """
+    Display the game over screen with the winner's name.
+    """
     # increase font sizes for a more dramatic effect
     font_big = pygame.font.SysFont('Arial', 120, bold=True)  # Larger font for "Game Over"
     font_small = pygame.font.SysFont('Arial', 80)  # Larger font for winner's name
@@ -86,6 +92,9 @@ def draw_game_over(win, game_state):
 
 
 def draw_promotion_menu(screen, color):
+    """
+    Display the promotion menu for pawn promotion.
+    """
     menu_width = 4 * SQUARE_SIZE
     menu_height = SQUARE_SIZE
     x = (screen.get_width() - menu_width) // 2

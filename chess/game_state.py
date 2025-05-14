@@ -12,17 +12,21 @@ pygame.mixer.init()
 
 
 class GameState:
-    def __init__(self):
+    """
+    Maintains the current state of the chess game.
+
+    Tracks piece positions, turn order, selection, legal moves,
+    check/checkmate status, promotions, and handles game logic.
+    """
+
+    def __init__(self, sound_manager):
+        self.sound_manager = sound_manager
         self.board_obj = Board()  # board instance
         self.selected_pos = None
         self.highlighted_moves = []
         self.turn_counter = 0
         self.captured_white = []  # black pieces captured by white
         self.captured_black = []  # white pieces captured by black
-        self.captured_sound = pygame.mixer.Sound('sound/capture.mp3')
-        self.moving_sound = pygame.mixer.Sound('sound/move.mp3')
-        self.check_notification = pygame.mixer.Sound('sound/check_notification.mp3')
-        self.checkmate_sound = pygame.mixer.Sound('sound/checkmate.mp3')
         self.w_king_pos = (7, 4)
         self.b_king_pos = (0, 4)
         self.w_check = False
@@ -66,7 +70,7 @@ class GameState:
                 self.b_king_pos = (dest_row, dest_col)
             board[dest_row][dest_col] = piece
             board[src_row][src_col] = '.'
-            self.moving_sound.play()
+            self.sound_manager.play_move()
             self.turn_counter += 1
             self.clear_selection()
             self.check_checker(board)
@@ -89,9 +93,9 @@ class GameState:
                 self.captured_white.append(captured)
             else:
                 self.captured_black.append(captured)
-            self.captured_sound.play()
+            self.sound_manager.play_capture()
         else:
-            self.moving_sound.play()
+            self.sound_manager.play_move()
 
         # Move the piece
         board[dest_row][dest_col] = piece
@@ -105,7 +109,7 @@ class GameState:
             piece.has_moved = True
 
         board[src_row][src_col] = '.'
-        self.moving_sound.play()
+        self.sound_manager.play_move()
         self.check_checker(board)
 
         self.turn_counter += 1
@@ -205,7 +209,7 @@ class GameState:
         self.b_check = self.is_king_in_check(board, 'b', self.b_king_pos)
 
         if self.w_check or self.b_check:
-            self.check_notification.play()
+            self.sound_manager.play_check_notification()
 
         self.checkmate_checker(board)
 
@@ -306,7 +310,7 @@ class GameState:
                         piece.row, piece.col = orig_row, orig_col
 
         # if loop completes, it's checkmate
-        self.checkmate_sound.play()
+        self.sound_manager.play_checkmate_sound()
         if color_in_check == 'w':
             self.b_wins = True
         else:
