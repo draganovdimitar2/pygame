@@ -156,7 +156,6 @@ class GameState:
 
         # only proceed if it's a 2-square horizontal move (possible castling)
         if abs(king.col - target_col) != 2:
-            print("Invalid castling move.")
             return False
 
         if target_col > king.col:
@@ -173,13 +172,11 @@ class GameState:
         # check path is clear
         for col in path_cols:
             if board[row][col] != '.':
-                print(f"Path blocked for castling at ({row}, {col})")
                 return False
 
         # validate rook
         rook = board[row][rook_col]
         if not isinstance(rook, Rook) or rook.has_moved:
-            print("Castling blocked or rook already moved.")
             return False
 
         # move the king
@@ -194,7 +191,6 @@ class GameState:
         rook.col = rook_target_col
         rook.has_moved = True
 
-        print(f"Castling completed for {king.color} king to ({row}, {target_col})")
         return True
 
     def clear_selection(self):
@@ -268,7 +264,6 @@ class GameState:
     def select_piece(self, piece, board):
         self.selected_pos = (piece.row, piece.col)
         self.highlighted_moves = self.get_legal_moves(piece, board)
-        print(f"Selected {piece}, possible moves: {self.highlighted_moves}")
 
     def checkmate_checker(self, board):
         if self.w_check:

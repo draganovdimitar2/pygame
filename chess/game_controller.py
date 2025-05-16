@@ -1,5 +1,7 @@
 import pygame
-from settings import SQUARE_SIZE
+from settings import SQUARE_SIZE, SCREEN_SIZE
+from chess.sound.sound_manager import SoundManager
+from chess.game_state import GameState
 from chess.visualisation import (
     draw_board, draw_pieces, draw_sidebar,
     draw_game_over, draw_promotion_menu,
@@ -46,7 +48,7 @@ class GameController:
         pygame.display.update()
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONUP:
+        if event.type == pygame.MOUSEBUTTONUP and not self.game_over:
             pos = event.pos  # or pygame.mouse.get_pos()
             self.game_state.handle_click(pos[0], pos[1], self.board)
 
@@ -57,3 +59,10 @@ class GameController:
                 if selected_piece:
                     self.game_state.promote_pawn(selected_piece)
                     self.game_state.turn_counter += 1
+
+        elif event.type == pygame.MOUSEBUTTONUP and self.game_over:  # handle game reset logic
+            screen = pygame.display.set_mode(SCREEN_SIZE)
+            sound = SoundManager()
+            game_state = GameState(sound_manager=sound)
+            new_controller = GameController(screen, sound, game_state)
+            return new_controller

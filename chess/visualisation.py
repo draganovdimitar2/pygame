@@ -74,21 +74,24 @@ def draw_game_over(win, game_state):
     Display the game over screen with the winner's name.
     """
     # increase font sizes for a more dramatic effect
-    font_big = pygame.font.SysFont('Arial', 120, bold=True)  # Larger font for "Game Over"
-    font_small = pygame.font.SysFont('Arial', 80)  # Larger font for winner's name
+    font_big = pygame.font.SysFont('Arial', 120, bold=True)  # larger font for "Game Over"
+    font_medium = pygame.font.SysFont('Arial', 80)  # larger font for winner's name
+    font_small = pygame.font.SysFont('Arial', 50)  # font for game reset
 
     # create text objects
     game_over_text = font_big.render('Game Over!', True, (0, 0, 0))
     winner = 'Black' if game_state.b_wins else 'White'
-    who_won_text = font_small.render(f'{winner} wins', True, (0, 0, 0))
+    who_won_text = font_medium.render(f'{winner} wins', True, (0, 0, 0))
+    reset_option = font_small.render("Press Left Mouse Button to reset the game.", True, (0, 0, 0))
 
     # center the texts on the screen
     game_over_rect = game_over_text.get_rect(center=(win.get_width() // 2, win.get_height() // 2 - 80))
     who_won_rect = who_won_text.get_rect(center=(win.get_width() // 2, win.get_height() // 2 + 40))
-
+    reset_rect = reset_option.get_rect(center=(win.get_width() // 2, win.get_height() // 2 + 110))
     # draw the texts on the screen
     win.blit(game_over_text, game_over_rect)
     win.blit(who_won_text, who_won_rect)
+    win.blit(reset_option, reset_rect)
 
 
 def draw_promotion_menu(screen, color):

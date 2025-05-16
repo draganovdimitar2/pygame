@@ -14,7 +14,6 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 controller = GameController(screen, sound, game_state)
 clock = pygame.time.Clock()
 
-game_over = False
 running = True
 while running:
     controller.update()
@@ -25,6 +24,8 @@ while running:
             running = False
             exit()
 
-        controller.handle_event(event)
+        new_controller = controller.handle_event(event)
+        if new_controller is not None:
+            controller = new_controller  # when resetting the game update with new instance
 
     clock.tick(FPS)
